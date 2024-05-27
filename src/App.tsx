@@ -1,7 +1,10 @@
+import { Toaster } from "react-hot-toast";
 import { BrowserRouter } from "react-router-dom";
 import { ThemeProvider } from "styled-components";
 import "./App.css";
-import { Button } from "./components/Button/styles";
+import ErrorBoundary from "./components/ErrorBoundary/ErrorBoundary";
+import { AuthContext, AuthProvider } from "./contexts/userAuth";
+import { ProjectRoutes } from "./routes";
 import theme from "./theme";
 
 function App() {
@@ -9,8 +12,17 @@ function App() {
     <>
       <BrowserRouter>
         <ThemeProvider theme={theme}>
-          <div>Simbora manooowww</div>
-          <Button color="orange">Clica nessa peste!</Button>
+          <ErrorBoundary>
+            <AuthProvider>
+              <div>
+                <AuthContext.Consumer>
+                  {(context) => context.isAuthenticated}
+                </AuthContext.Consumer>
+                <Toaster position="top-right" reverseOrder={true}></Toaster>
+                <ProjectRoutes />
+              </div>
+            </AuthProvider>
+          </ErrorBoundary>
         </ThemeProvider>
       </BrowserRouter>
     </>
