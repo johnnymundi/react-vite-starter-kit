@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useEffect, useState } from "react";
+import { createContext, ReactNode, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { api, applyToken } from "../services/api";
 
@@ -21,17 +21,17 @@ type RecoveryPasswordCredentials = {
 };
 
 type User = {
-  id: number;
-  profile: string;
-  user_type: number;
-  is_locked: boolean;
-  pseudo_anonymize: boolean;
-  companies_name: string;
-  limit_lock_days: number;
-  name: string;
-  cpf: string;
-  office: string;
+  id: string;
+  username: string;
   email: string;
+  first_name: string | null;
+  is_active: boolean;
+  is_staff: boolean;
+  is_superuser: boolean;
+  last_login: string;
+  last_name: string | null;
+  created_at: string;
+  updated_at: string;
 };
 
 type AuthContextData = {
@@ -43,9 +43,7 @@ type AuthContextData = {
   ) => Promise<boolean>;
   errorLogin: boolean;
   errorReason: string;
-  isFirstAccess: boolean;
   isAuthenticated: boolean;
-  isCommonUser: boolean;
   user: User;
 };
 
@@ -56,65 +54,34 @@ export const AuthContext = createContext({} as AuthContextData);
 export function AuthProvider({ children }: AuthProviderProps) {
   const navigate = useNavigate();
   const [user, setUser] = useState<User>({} as User);
-  const [isFirstAccess, setIsFirstAccess] = useState<boolean>(false);
+  //const [isFirstAccess, setIsFirstAccess] = useState<boolean>(false);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(
-    !!localStorage.getItem("@SismieGEE:token") && !isFirstAccess
+    !!localStorage.getItem("@Ogvcolor:token")
   );
-
-  const isCommonUser =
-    user &&
-    user.profile !== "sinergia" &&
-    user.profile !== "admin" &&
-    user.profile !== "analyst";
 
   // && user.profile !== 'analyst'
 
   const [errorLogin, setErrorLogin] = useState<boolean>(false);
   const [errorReason, setErrorReason] = useState<string>("");
 
-  useEffect(
+  /*   useEffect(
     () => {
-      const token = localStorage.getItem("@SismieGEE:token");
+      const token = localStorage.getItem("@Ogvcolor:token");
 
       if (token) {
         getMe();
       }
     }, // eslint-disable-next-line react-hooks/exhaustive-deps
     []
-  );
+  ); */
 
-  async function getMe() {
+  /* async function getMe() {
     setErrorLogin(false);
 
     try {
       const response = await api.get("/login/me");
-      const {
-        profile,
-        companies_name,
-        name,
-        id,
-        cpf,
-        office,
-        email,
-        is_locked,
-        limit_lock_days,
-        pseudo_anonymize,
-        user_type,
-      } = response.data;
 
-      setUser({
-        profile,
-        name,
-        companies_name,
-        id,
-        cpf,
-        office,
-        email,
-        is_locked,
-        pseudo_anonymize,
-        limit_lock_days,
-        user_type,
-      });
+      setUser(response.data);
       setIsAuthenticated(true);
     } catch (error) {
       console.log(error);
@@ -123,36 +90,27 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
       navigate("/login");
     }
-  }
+  } */
 
   async function signIn(data: SignInCredentials) {
     try {
-      const response = await api.post("/login", data);
+      const response = await api.post("/auth/login/", data);
 
-      setUser({
-        limit_lock_days: response.data.user.limit_lock_days,
-        profile: response.data.user.profile,
-        is_locked: response.data.user.is_locked,
-        pseudo_anonymize: response.data.user.pseudo_anonymize,
-        user_type: response.data.user.user_type,
-        companies_name: response.data.user.companies_name,
-        name: response.data.user.name,
-        cpf: response.data.user.cpf,
-        office: response.data.user.office,
-        email: response.data.user.email,
-        id: response.data.user.id,
-      });
+      const { token, user } = response.data.data;
 
-      setIsFirstAccess(response.data.is_first_login);
-      setTokenInLocalStorage(response.data.token);
+      setUser(user);
 
-      if (!response.data.is_first_login) {
+      //setIsFirstAccess(response.data.is_first_login);
+      setTokenInLocalStorage(token);
+      setIsAuthenticated(true);
+
+      /* if (!response.data.is_first_login) {
         setIsAuthenticated(true);
         setErrorLogin(false);
         navigate("/inventario");
       } else {
         navigate("/nova-senha");
-      }
+      } */
       if (response) {
         setErrorLogin(false);
       }
@@ -198,12 +156,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }
 
   function setTokenInLocalStorage(token: string) {
-    localStorage.setItem("@SismieGEE:token", JSON.stringify(token));
+    console.log("setTokenInLocalStorage", token);
+    localStorage.setItem("@Ogvcolor:token", JSON.stringify(token));
     applyToken("");
   }
 
   function removeTokenInLocalStorage() {
-    localStorage.removeItem("@SismieGEE:token");
+    localStorage.removeItem("@Ogvcolor:token");
   }
 
   async function logout(redir = true) {
@@ -230,10 +189,8 @@ export function AuthProvider({ children }: AuthProviderProps) {
         recoveryPassword,
         errorLogin,
         errorReason,
-        isFirstAccess,
         isAuthenticated,
         user,
-        isCommonUser,
       }}
     >
       {children}

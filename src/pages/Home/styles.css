@@ -1,0 +1,52 @@
+@media screen and (max-width: 1250px) {
+  .phrase-head img {
+    width: 500px;
+  }
+
+  .where-to-find img {
+    width: 170px;
+  }
+
+  .icons-midia img {
+    width: 35px;
+  }
+
+  .circle-blue img {
+    width: 5%;
+    margin-bottom: 0px;
+  }
+
+  .form-content {
+    left: -15%;
+  }
+
+  .logo-image {
+    left: -68%;
+  }
+}
+
+@media screen and (max-width: 1000px) {
+  .phrase-head img {
+    width: 400px;
+  }
+
+  .where-to-find img {
+    width: 150px;
+  }
+
+  .icons-midia img {
+    width: 30px;
+  }
+
+  .circle-blue img {
+    width: 6%;
+  }
+
+  .form-content {
+    left: -18%;
+  }
+
+  .logo-image {
+    left: -75%;
+  }
+}
