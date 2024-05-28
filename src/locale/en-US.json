@@ -1,0 +1,7 @@
+{
+  "translation": {
+    "header": "Our Header",
+    "footer": "Footer {{year}}",
+    "home": "Your are at HomePage"
+  }
+}

@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes } from "react-router-dom";
 import useAuth from "../hooks/useAuth";
+import AuthenticatedLayout from "../layout/AuthenticatedLayout";
 import { Home } from "../pages/Home";
 import { Login } from "../pages/Login";
 
@@ -14,9 +15,17 @@ export const ProjectRoutes = () => {
       />
       <Route
         path="/"
-        element={isAuthenticated ? <Home /> : <Navigate to="/login" />}
+        element={
+          isAuthenticated ? (
+            <AuthenticatedLayout>
+              <Home />
+            </AuthenticatedLayout>
+          ) : (
+            <Navigate to="/login" />
+          )
+        }
       />
-      {/* <Route
+      <Route
         path="/min-max-standard"
         element={
           isAuthenticated ? "<MinMaxStandard />" : <Navigate to="/login" />
@@ -41,7 +50,7 @@ export const ProjectRoutes = () => {
       <Route
         path="/hub"
         element={isAuthenticated ? "<Hub />" : <Navigate to="/login" />}
-      /> */}
+      />
       <Route
         path="*"
         element={<Navigate to={isAuthenticated ? "/" : "/login"} />}
