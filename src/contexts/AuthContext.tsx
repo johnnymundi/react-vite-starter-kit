@@ -20,6 +20,9 @@ type RecoveryPasswordCredentials = {
   email: string;
 };
 
+// This kind interface type data is derived from Django API response
+// I verified that, transforming to camelcase takes some time, depending on the type of data
+// So, I choose to keep the snake case of Django.
 type User = {
   id: string;
   username: string;
@@ -54,43 +57,12 @@ export const AuthContext = createContext({} as AuthContextData);
 export function AuthProvider({ children }: AuthProviderProps) {
   const navigate = useNavigate();
   const [user, setUser] = useState<User>({} as User);
-  //const [isFirstAccess, setIsFirstAccess] = useState<boolean>(false);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(
-    !!localStorage.getItem("@Ogvcolor:token")
+    !!localStorage.getItem("@SomeBullshitName:token")
   );
-
-  // && user.profile !== 'analyst'
 
   const [errorLogin, setErrorLogin] = useState<boolean>(false);
   const [errorReason, setErrorReason] = useState<string>("");
-
-  /*   useEffect(
-    () => {
-      const token = localStorage.getItem("@Ogvcolor:token");
-
-      if (token) {
-        getMe();
-      }
-    }, // eslint-disable-next-line react-hooks/exhaustive-deps
-    []
-  ); */
-
-  /* async function getMe() {
-    setErrorLogin(false);
-
-    try {
-      const response = await api.get("/login/me");
-
-      setUser(response.data);
-      setIsAuthenticated(true);
-    } catch (error) {
-      console.log(error);
-
-      setIsAuthenticated(false);
-
-      navigate("/login");
-    }
-  } */
 
   async function signIn(data: SignInCredentials) {
     try {
@@ -99,18 +71,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
       const { token, user } = response.data.data;
 
       setUser(user);
-
-      //setIsFirstAccess(response.data.is_first_login);
       setTokenInLocalStorage(token);
       setIsAuthenticated(true);
 
-      /* if (!response.data.is_first_login) {
-        setIsAuthenticated(true);
-        setErrorLogin(false);
-        navigate("/inventario");
-      } else {
-        navigate("/nova-senha");
-      } */
       if (response) {
         setErrorLogin(false);
       }
@@ -128,7 +91,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   async function updatePassword(data: UpdatePasswordCredentials) {
     try {
-      const response = await api.post("/login/update_password", data);
+      const response = await api.post("auth/login/update_password", data);
 
       if (response) {
         setIsAuthenticated(false);
@@ -145,8 +108,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   async function recoveryPassword(credentials: RecoveryPasswordCredentials) {
     try {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const response = await api.post("/login/recover_password", credentials);
+      await api.post("auth/login/recover_password", credentials);
 
       return true;
     } catch (error) {
@@ -156,18 +118,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }
 
   function setTokenInLocalStorage(token: string) {
-    console.log("setTokenInLocalStorage", token);
-    localStorage.setItem("@Ogvcolor:token", JSON.stringify(token));
-    applyToken("");
+    localStorage.setItem("@SomeBullshitName:token", JSON.stringify(token));
+    applyToken(token);
   }
 
   function removeTokenInLocalStorage() {
-    localStorage.removeItem("@Ogvcolor:token");
+    localStorage.removeItem("@SomeBullshitName:token");
+    applyToken(); // required for subsequently login after a login (otherwise the later token will be applied in the request)
   }
 
   async function logout(redir = true) {
     try {
-      await api.post("logout");
+      await api.post("auth/logout");
       removeTokenInLocalStorage();
       setIsAuthenticated(false);
 
@@ -175,8 +137,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
     } catch (error) {
       removeTokenInLocalStorage();
       setIsAuthenticated(false);
-
-      if (redir) navigate("/inventario");
     }
   }
 

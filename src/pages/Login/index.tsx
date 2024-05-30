@@ -3,7 +3,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { Button } from "../../components/Button/styles";
 import { TitleText } from "../../components/TitleText";
-import useAuth from "../../hooks/useAuth";
+import useAuth from "../../hooks/AuthContext";
 import "../../pages/Login/styles.css";
 import { Container } from "./styles";
 
@@ -18,7 +18,7 @@ export const Login = () => {
   const { signIn, errorLogin, errorReason } = useAuth();
   const [loginError, setLoginError] = useState(false);
   const {
-    register,
+    register, // part of React Hook
     handleSubmit,
     formState: { errors },
   } = useForm<Inputs>();
@@ -35,6 +35,7 @@ export const Login = () => {
       signIn(credentials).then(() => {
         if (errorLogin) {
           if (errorReason.includes("password")) {
+            // Make sure to verify if API error response contains this
             console.log("password incorrect");
             setLoginError(true);
 
@@ -137,7 +138,7 @@ export const Login = () => {
 
                 {errors.password && (
                   <span className="requiredLabel" style={{ marginLeft: -30 }}>
-                    Esse campo é obrigatório
+                    Required field
                   </span>
                 )}
               </div>
@@ -148,7 +149,7 @@ export const Login = () => {
                 className="requiredLabel"
                 style={{ fontWeight: "bold", fontSize: 13, marginLeft: "5px" }}
               >
-                Sua conta está bloqueada, contacte o administrador
+                Your account is blocked. Make sure to contact the administrator
               </span>
             )}
 
@@ -157,16 +158,10 @@ export const Login = () => {
                 className="requiredLabel"
                 style={{ fontWeight: "bold", fontSize: 13 }}
               >
-                Usuário com acesso expirado ou inativo, contacte o administrador
+                Accessed expired or inactivated. Make sure to contact the
+                administrator
               </span>
             )}
-
-            {/* {errorLogin && errorReason.includes("password") && (
-                            <span className={`requiredLabel ${isBlinking ? 'blinking-text' : ''}`} style={{fontWeight:"bold", fontSize:13, marginLeft: '5px'}}>
-                                Usuário e/ou senha inválidos. Tentativas restantes: <u style={{fontSize:14}}>{attemptsLeft}</u>
-                            </span>
-                        )} */}
-
             <Button
               color="white"
               type="submit"
@@ -193,7 +188,7 @@ export const Login = () => {
             </Button>
 
             <span
-              onClick={() => navigate("/recuperar-senha")}
+              onClick={() => navigate("/recover-password")}
               style={{
                 display: "flex",
                 justifyContent: "right",
@@ -208,11 +203,7 @@ export const Login = () => {
                 marginLeft: "100px",
               }}
             >
-              <img
-                src={"IconForgetPsw"}
-                alt="esqueci-minha-senha"
-                width={160}
-              />
+              <img src={"IconForgetPsw"} alt="forgot-password" width={160} />
             </span>
           </form>
         </div>
